@@ -114,6 +114,15 @@ class ByocJobResponse:
             if "url" in img:
                 return img["url"]
         if isinstance(self.data, dict):
+            # Single-image providers return `image` as a dict (bg-remove, topaz-upscale,
+            # codeformer, ideogram-bg-remove, ccsr-upscale, ip-adapter-face) rather than an
+            # `images` list. Without this the render succeeds and is BILLED, but the caller
+            # gets image_url=None. `video_url` already did this for `video`.
+            img = self.data.get("image")
+            if isinstance(img, dict) and isinstance(img.get("url"), str):
+                return img["url"]
+            if isinstance(img, str) and img:
+                return img
             return self.data.get("image_url") or self.data.get("url")
         return None
 
