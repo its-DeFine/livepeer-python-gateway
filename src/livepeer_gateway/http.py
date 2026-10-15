@@ -98,8 +98,7 @@ def _json_request_parts(
     if headers:
         req_headers.update(headers)
 
-    has_body = body is not None
-    resolved_method = method.upper() if method else ("POST" if has_body else "GET")
+    resolved_method = method.upper() if method else ("POST" if body is not None else "GET")
     return resolved_method, req_headers, body
 
 
