@@ -756,7 +756,7 @@ async def call_runner(
     *,
     runner: LiveRunnerInstance | None = ...,
     payload: dict[str, Any] | None = ...,
-    data: bytes | None = ...,
+    content: bytes | None = ...,
     content_type: str | None = ...,
     method: str = ...,
     signer_url: str | None = ...,
@@ -775,7 +775,7 @@ async def call_runner(
     *,
     runner: LiveRunnerInstance | None = ...,
     payload: dict[str, Any] | None = ...,
-    data: bytes | None = ...,
+    content: bytes | None = ...,
     content_type: str | None = ...,
     method: str = ...,
     signer_url: str | None = ...,
@@ -793,7 +793,7 @@ async def call_runner(
     *,
     runner: LiveRunnerInstance | None = None,
     payload: dict[str, Any] | None = None,
-    data: bytes | None = None,
+    content: bytes | None = None,
     content_type: str | None = None,
     method: str = "POST",
     signer_url: str | None = None,
@@ -812,8 +812,8 @@ async def call_runner(
     ``application/json`` and ``+json`` types parse into ``result.data``; anything else
     (an image, ndjson) comes back unparsed in ``result.content`` + ``result.content_type``.
 
-    The request body is JSON (``payload``) or raw bytes (``data``), not both. ``data`` is
-    sent as is with ``Content-Type: content_type`` (default ``application/octet-stream``),
+    The request body is JSON (``payload``) or raw bytes (``content``), not both. ``content``
+    is sent as is with ``Content-Type: content_type`` (default ``application/octet-stream``),
     for apps that take an image, audio or any other binary body. Raise ``timeout`` for
     large bodies, since it bounds the whole request.
 
@@ -822,12 +822,12 @@ async def call_runner(
     runner_url = runner_url.strip() or (runner.url.strip() if runner is not None else "")
     if not runner_url:
         raise LivepeerGatewayError("Live runner call requires runner_url")
-    if payload is not None and data is not None:
-        raise LivepeerGatewayError("Live runner call takes payload (JSON) or data (bytes), not both")
-    request_payload = None if data is not None else (payload or {})
+    if payload is not None and content is not None:
+        raise LivepeerGatewayError("Live runner call takes payload (JSON) or content (bytes), not both")
+    request_payload = None if content is not None else (payload or {})
     # Only a raw body needs these; JSON calls keep their existing request arguments.
     body_kwargs: dict[str, Any] = (
-        {"data": data, "content_type": content_type} if data is not None else {}
+        {"content": content, "content_type": content_type} if content is not None else {}
     )
     payment_type = _runner_payment_type(runner, payment_unit) if signer_url else ""
     max_price: LiveRunnerPriceInfo | None = None

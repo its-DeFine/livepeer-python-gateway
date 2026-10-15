@@ -78,12 +78,12 @@ def _json_request_parts(
     *,
     method: str | None = None,
     payload: dict[str, Any] | None = None,
-    data: bytes | None = None,
+    content: bytes | None = None,
     content_type: str | None = None,
     headers: dict[str, str] | None = None,
 ) -> tuple[str, dict[str, str], bytes | None]:
-    if payload is not None and data is not None:
-        raise ValueError("pass either payload (JSON) or data (raw bytes), not both")
+    if payload is not None and content is not None:
+        raise ValueError("pass either payload (JSON) or content (raw bytes), not both")
     req_headers: dict[str, str] = {
         "Accept": "application/json",
         "User-Agent": "livepeer-python-gateway/0.1",
@@ -92,9 +92,9 @@ def _json_request_parts(
     if payload is not None:
         req_headers["Content-Type"] = "application/json"
         body = json.dumps(payload).encode("utf-8")
-    elif data is not None:
+    elif content is not None:
         req_headers["Content-Type"] = content_type or "application/octet-stream"
-        body = bytes(data)
+        body = bytes(content)
     if headers:
         req_headers.update(headers)
 
@@ -235,7 +235,7 @@ async def _request_body(
     *,
     method: str | None = None,
     payload: dict[str, Any] | None = None,
-    data: bytes | None = None,
+    content: bytes | None = None,
     content_type: str | None = None,
     headers: dict[str, str] | None = None,
     timeout: float = 5.0,
@@ -254,7 +254,7 @@ async def _request_body(
         url,
         method=method,
         payload=payload,
-        data=data,
+        content=content,
         content_type=content_type,
         headers=headers,
     )
@@ -332,7 +332,7 @@ async def open_stream(
     *,
     method: str | None = None,
     payload: dict[str, Any] | None = None,
-    data: bytes | None = None,
+    content: bytes | None = None,
     content_type: str | None = None,
     headers: dict[str, str] | None = None,
     connect_timeout: float = 10.0,
@@ -349,7 +349,7 @@ async def open_stream(
         url,
         method=method,
         payload=payload,
-        data=data,
+        content=content,
         content_type=content_type,
         headers=headers,
     )

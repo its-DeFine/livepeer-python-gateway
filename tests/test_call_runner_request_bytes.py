@@ -1,6 +1,6 @@
 """Tests for raw byte request bodies in call_runner.
 
-``payload`` keeps sending JSON. ``data`` sends the bytes as is with the given
+``payload`` keeps sending JSON. ``content`` sends the bytes as is with the given
 content type, and the two are mutually exclusive.
 """
 
@@ -50,7 +50,7 @@ def test_bytes_sent_as_is_with_content_type():
     seen: dict = {}
 
     async def scenario(base):
-        return await call_runner(f"{base}/in", data=FAKE_PNG, content_type="image/png")
+        return await call_runner(f"{base}/in", content=FAKE_PNG, content_type="image/png")
 
     result = _run(_echo_app(seen), scenario)
     assert seen["body"] == FAKE_PNG
@@ -63,7 +63,7 @@ def test_bytes_default_content_type_is_octet_stream():
     seen: dict = {}
 
     async def scenario(base):
-        return await call_runner(f"{base}/in", data=b"\x00\x01\x02")
+        return await call_runner(f"{base}/in", content=b"\x00\x01\x02")
 
     _run(_echo_app(seen), scenario)
     assert seen["body"] == b"\x00\x01\x02"
@@ -74,7 +74,7 @@ def test_empty_bytes_body_is_sent_as_post():
     seen: dict = {}
 
     async def scenario(base):
-        return await call_runner(f"{base}/in", data=b"")
+        return await call_runner(f"{base}/in", content=b"")
 
     _run(_echo_app(seen), scenario)
     assert seen["method"] == "POST"
@@ -97,7 +97,7 @@ def test_bytes_with_stream():
 
     async def scenario(base):
         async with await call_runner(
-            f"{base}/in", data=FAKE_PNG, content_type="image/png", stream=True
+            f"{base}/in", content=FAKE_PNG, content_type="image/png", stream=True
         ) as stream:
             return b"".join([chunk async for chunk in stream.aiter_bytes()])
 
@@ -109,7 +109,7 @@ def test_bytes_with_stream():
 
 def test_payload_and_data_are_mutually_exclusive():
     async def scenario(base):
-        return await call_runner(f"{base}/in", payload={"x": 1}, data=b"y")
+        return await call_runner(f"{base}/in", payload={"x": 1}, content=b"y")
 
     with pytest.raises(LivepeerGatewayError):
         _run(_echo_app({}), scenario)
