@@ -814,8 +814,11 @@ async def call_runner(
 
     The request body is JSON (``payload``) or raw bytes (``content``), not both. ``content``
     is sent as is with ``Content-Type: content_type`` (default ``application/octet-stream``),
-    for apps that take an image, audio or any other binary body. Raise ``timeout`` for
-    large bodies, since it bounds the whole request.
+    for apps that take an image, audio or any other binary body.
+
+    ``timeout`` is the total time allowed for each buffered request attempt, so raise it
+    for large bodies. It restarts on every payment retry, so it does not bound the whole
+    call, and it is not applied when ``stream=True``.
 
     The request asks for no particular format, so the app picks what it returns.
     """
