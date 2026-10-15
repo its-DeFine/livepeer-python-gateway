@@ -265,7 +265,7 @@ async def _request_body(
         async with aiohttp.ClientSession(timeout=client_timeout, connector=connector) as session:
             async with session.request(resolved_method, url, data=body, headers=req_headers) as resp:
                 raw = await resp.read()
-                content_type = resp.content_type or ""
+                response_content_type = resp.content_type or ""
                 if resp.status >= 400:
                     _raise_http_json_error(
                         resp.status, url, raw.decode(errors="replace")
@@ -294,7 +294,7 @@ async def _request_body(
             f"HTTP JSON error: unexpected error: {e.__class__.__name__}: {e} (url={url})"
         ) from e
 
-    return raw, content_type
+    return raw, response_content_type
 
 
 async def request_json(
